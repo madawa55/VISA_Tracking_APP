@@ -24,13 +24,103 @@ const docStatusConfig: Record<DocumentStatus, { label: string; color: string; do
 function DocumentRow({
   doc,
   onStatusChange,
+  onEdit,
+  onDelete,
 }: {
   doc: Document;
   onStatusChange: (id: string, status: DocumentStatus) => void;
+  onEdit: (id: string, updated: Partial<Document>) => void;
+  onDelete: (id: string) => void;
 }) {
+  const [editing, setEditing] = useState(false);
+  const [editName, setEditName] = useState(doc.name);
+  const [editDesc, setEditDesc] = useState(doc.description);
+  const [editRequired, setEditRequired] = useState(doc.required);
+
   const cfg = docStatusConfig[doc.status];
+
+  const handleSave = () => {
+    onEdit(doc.id, {
+      name: editName.trim() || doc.name,
+      description: editDesc.trim(),
+      required: editRequired,
+    });
+    setEditing(false);
+  };
+
+  const handleCancel = () => {
+    setEditName(doc.name);
+    setEditDesc(doc.description);
+    setEditRequired(doc.required);
+    setEditing(false);
+  };
+
+  if (editing) {
+    return (
+      <div className="py-3 border-b border-white/5 last:border-0">
+        <div className="flex flex-col gap-2">
+          {/* Name */}
+          <input
+            type="text"
+            value={editName}
+            onChange={(e) => setEditName(e.target.value)}
+            placeholder="Document name"
+            className="text-sm bg-gray-900 border border-blue-500/50 rounded px-2 py-1 text-white focus:outline-none focus:ring-1 focus:ring-blue-500 w-full"
+          />
+          {/* Description */}
+          <textarea
+            value={editDesc}
+            onChange={(e) => setEditDesc(e.target.value)}
+            placeholder="Description (optional)"
+            rows={2}
+            className="text-xs bg-gray-900 border border-white/10 rounded px-2 py-1 text-gray-300 focus:outline-none focus:ring-1 focus:ring-blue-500 w-full resize-none"
+          />
+          {/* Required toggle */}
+          <label className="flex items-center gap-2 cursor-pointer select-none">
+            <div
+              onClick={() => setEditRequired(!editRequired)}
+              className={`w-8 h-4 rounded-full transition-colors duration-200 flex items-center px-0.5 ${
+                editRequired ? "bg-red-500" : "bg-gray-600"
+              }`}
+            >
+              <div
+                className={`w-3 h-3 rounded-full bg-white shadow transition-transform duration-200 ${
+                  editRequired ? "translate-x-4" : "translate-x-0"
+                }`}
+              />
+            </div>
+            <span className="text-xs text-gray-400">
+              {editRequired ? "Required" : "Optional"}
+            </span>
+          </label>
+          {/* Actions */}
+          <div className="flex gap-2 mt-1">
+            <button
+              onClick={handleSave}
+              className="text-xs bg-blue-600 hover:bg-blue-500 text-white px-3 py-1 rounded transition-colors"
+            >
+              Save
+            </button>
+            <button
+              onClick={handleCancel}
+              className="text-xs bg-gray-700 hover:bg-gray-600 text-gray-300 px-3 py-1 rounded transition-colors"
+            >
+              Cancel
+            </button>
+            <button
+              onClick={() => onDelete(doc.id)}
+              className="text-xs bg-red-900/50 hover:bg-red-800/60 text-red-300 px-3 py-1 rounded transition-colors ml-auto"
+            >
+              Delete
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   return (
-    <div className="flex items-start gap-3 py-2 border-b border-white/5 last:border-0">
+    <div className="flex items-start gap-3 py-2 border-b border-white/5 last:border-0 group">
       <span className={`mt-1.5 w-2 h-2 rounded-full flex-shrink-0 ${cfg.dot}`} />
       <div className="flex-1 min-w-0">
         <div className="flex items-center gap-2 flex-wrap">
@@ -39,8 +129,18 @@ function DocumentRow({
             <span className="text-xs bg-red-900/50 text-red-300 px-1.5 py-0.5 rounded">Required</span>
           )}
         </div>
-        <p className="text-xs text-gray-400 mt-0.5">{doc.description}</p>
+        {doc.description && (
+          <p className="text-xs text-gray-400 mt-0.5">{doc.description}</p>
+        )}
       </div>
+      {/* Edit button — visible on hover */}
+      <button
+        onClick={() => setEditing(true)}
+        title="Edit document"
+        className="opacity-0 group-hover:opacity-100 text-gray-500 hover:text-blue-400 transition-all flex-shrink-0 mt-0.5 text-xs px-1.5 py-0.5 rounded hover:bg-blue-900/30"
+      >
+        ✏️
+      </button>
       <select
         value={doc.status}
         onChange={(e) => onStatusChange(doc.id, e.target.value as DocumentStatus)}
@@ -55,17 +155,103 @@ function DocumentRow({
   );
 }
 
+// ─── Add Document Form ─────────────────────────────────────────────────────────
+
+function AddDocumentForm({ onAdd }: { onAdd: (doc: Omit<Document, "id">) => void }) {
+  const [open, setOpen] = useState(false);
+  const [name, setName] = useState("");
+  const [desc, setDesc] = useState("");
+  const [required, setRequired] = useState(false);
+
+  const handleAdd = () => {
+    if (!name.trim()) return;
+    onAdd({ name: name.trim(), description: desc.trim(), status: "pending", required });
+    setName("");
+    setDesc("");
+    setRequired(false);
+    setOpen(false);
+  };
+
+  if (!open) {
+    return (
+      <button
+        onClick={() => setOpen(true)}
+        className="mt-2 w-full text-xs text-blue-400 hover:text-blue-300 border border-dashed border-blue-500/30 hover:border-blue-400/50 rounded-lg py-2 transition-colors flex items-center justify-center gap-1"
+      >
+        <span>+</span> Add Document
+      </button>
+    );
+  }
+
+  return (
+    <div className="mt-2 bg-gray-900/60 border border-blue-500/30 rounded-lg p-3 flex flex-col gap-2">
+      <p className="text-xs font-semibold text-blue-400 mb-1">New Document</p>
+      <input
+        type="text"
+        value={name}
+        onChange={(e) => setName(e.target.value)}
+        placeholder="Document name *"
+        className="text-sm bg-gray-900 border border-white/10 rounded px-2 py-1 text-white focus:outline-none focus:ring-1 focus:ring-blue-500 w-full"
+        autoFocus
+      />
+      <textarea
+        value={desc}
+        onChange={(e) => setDesc(e.target.value)}
+        placeholder="Description (optional)"
+        rows={2}
+        className="text-xs bg-gray-900 border border-white/10 rounded px-2 py-1 text-gray-300 focus:outline-none focus:ring-1 focus:ring-blue-500 w-full resize-none"
+      />
+      <label className="flex items-center gap-2 cursor-pointer select-none">
+        <div
+          onClick={() => setRequired(!required)}
+          className={`w-8 h-4 rounded-full transition-colors duration-200 flex items-center px-0.5 ${
+            required ? "bg-red-500" : "bg-gray-600"
+          }`}
+        >
+          <div
+            className={`w-3 h-3 rounded-full bg-white shadow transition-transform duration-200 ${
+              required ? "translate-x-4" : "translate-x-0"
+            }`}
+          />
+        </div>
+        <span className="text-xs text-gray-400">{required ? "Required" : "Optional"}</span>
+      </label>
+      <div className="flex gap-2 mt-1">
+        <button
+          onClick={handleAdd}
+          disabled={!name.trim()}
+          className="text-xs bg-blue-600 hover:bg-blue-500 disabled:opacity-40 disabled:cursor-not-allowed text-white px-3 py-1 rounded transition-colors"
+        >
+          Add
+        </button>
+        <button
+          onClick={() => { setOpen(false); setName(""); setDesc(""); setRequired(false); }}
+          className="text-xs bg-gray-700 hover:bg-gray-600 text-gray-300 px-3 py-1 rounded transition-colors"
+        >
+          Cancel
+        </button>
+      </div>
+    </div>
+  );
+}
+
 // ─── Step Card ─────────────────────────────────────────────────────────────────
 
 function StepCard({
   step,
   onDocStatusChange,
   onStepStatusChange,
+  onDocEdit,
+  onDocDelete,
+  onDocAdd,
   isLast,
 }: {
   step: VisaStep;
   onDocStatusChange: (stepId: string, docId: string, status: DocumentStatus) => void;
   onStepStatusChange: (stepId: string, status: StepStatus) => void;
+  onDocEdit: (stepId: string, docId: string, updated: Partial<Document>) => void;
+  onDocDelete: (stepId: string, docId: string) => void;
+  onDocAdd: (stepId: string, doc: Omit<Document, "id">) => void;
   isLast: boolean;
 }) {
   const [expanded, setExpanded] = useState(step.status === "in-progress");
@@ -140,22 +326,26 @@ function StepCard({
             </div>
 
             {/* Documents */}
-            {step.documents.length > 0 && (
-              <div className="mb-4">
-                <h4 className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-2">
-                  Documents Checklist
-                </h4>
-                <div className="bg-black/20 rounded-lg px-3 py-1">
-                  {step.documents.map((doc) => (
-                    <DocumentRow
-                      key={doc.id}
-                      doc={doc}
-                      onStatusChange={(docId, status) => onDocStatusChange(step.id, docId, status)}
-                    />
-                  ))}
-                </div>
+            <div className="mb-4">
+              <h4 className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-2">
+                Documents Checklist
+              </h4>
+              <div className="bg-black/20 rounded-lg px-3 py-1">
+                {step.documents.length === 0 && (
+                  <p className="text-xs text-gray-500 py-2 text-center">No documents yet. Add one below.</p>
+                )}
+                {step.documents.map((doc) => (
+                  <DocumentRow
+                    key={doc.id}
+                    doc={doc}
+                    onStatusChange={(docId, status) => onDocStatusChange(step.id, docId, status)}
+                    onEdit={(docId, updated) => onDocEdit(step.id, docId, updated)}
+                    onDelete={(docId) => onDocDelete(step.id, docId)}
+                  />
+                ))}
               </div>
-            )}
+              <AddDocumentForm onAdd={(doc) => onDocAdd(step.id, doc)} />
+            </div>
 
             {/* Tips */}
             {step.tips && step.tips.length > 0 && (
@@ -250,6 +440,45 @@ export default function VisaTracker({
     );
   };
 
+  const handleDocEdit = (stepId: string, docId: string, updated: Partial<Document>) => {
+    setSteps((prev) =>
+      prev.map((step) =>
+        step.id === stepId
+          ? {
+              ...step,
+              documents: step.documents.map((doc) =>
+                doc.id === docId ? { ...doc, ...updated } : doc
+              ),
+            }
+          : step
+      )
+    );
+  };
+
+  const handleDocDelete = (stepId: string, docId: string) => {
+    setSteps((prev) =>
+      prev.map((step) =>
+        step.id === stepId
+          ? { ...step, documents: step.documents.filter((doc) => doc.id !== docId) }
+          : step
+      )
+    );
+  };
+
+  const handleDocAdd = (stepId: string, doc: Omit<Document, "id">) => {
+    const newDoc: Document = {
+      ...doc,
+      id: `${stepId}-doc-${Date.now()}`,
+    };
+    setSteps((prev) =>
+      prev.map((step) =>
+        step.id === stepId
+          ? { ...step, documents: [...step.documents, newDoc] }
+          : step
+      )
+    );
+  };
+
   const handleStepStatusChange = (stepId: string, status: StepStatus) => {
     setSteps((prev) =>
       prev.map((step) => (step.id === stepId ? { ...step, status } : step))
@@ -280,6 +509,9 @@ export default function VisaTracker({
             step={step}
             onDocStatusChange={handleDocStatusChange}
             onStepStatusChange={handleStepStatusChange}
+            onDocEdit={handleDocEdit}
+            onDocDelete={handleDocDelete}
+            onDocAdd={handleDocAdd}
             isLast={idx === steps.length - 1}
           />
         ))}
