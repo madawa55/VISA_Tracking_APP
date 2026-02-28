@@ -41,11 +41,11 @@ export default function Home() {
 
       {/* Content */}
       <div className="max-w-4xl mx-auto px-4 sm:px-6 py-10 space-y-16">
-        {/* Student Visa Section */}
+        {/* Student Visa Section - Wife (Main Applicant) */}
         <section>
           <VisaTracker
-            title="🎓 Student Visa (FV)"
-            subtitle="New Zealand Student Visa — step-by-step process from university offer to arrival"
+            title="🎓 Student Visa (Wife - Main Applicant)"
+            subtitle="New Zealand Student Visa — Primary applicant, step-by-step from university offer to arrival"
             initialSteps={studentVisaSteps}
             accentColor="blue"
             storageKey="nz-student-visa-tracker"
@@ -55,8 +55,17 @@ export default function Home() {
         {/* Divider */}
         <div className="border-t border-white/10" />
 
-        {/* Dependent Visa Section */}
-        <DependentVisaSection />
+        {/* Dependent Visa Section - Husband & Daughter */}
+        <section>
+          <h2 className="text-2xl font-bold text-white mb-6 flex items-center gap-2">
+            <span>👨‍👩‍👧</span>
+            <span>Dependent Visas</span>
+          </h2>
+          <p className="text-gray-400 mb-6">
+            Track your dependent visa applications (Husband & Daughter). Each has separate tracking and progress.
+          </p>
+          <DependentVisaSection />
+        </section>
 
         {/* Footer note */}
         <div className="bg-blue-950/30 border border-blue-800/30 rounded-xl p-5 text-sm text-gray-400">

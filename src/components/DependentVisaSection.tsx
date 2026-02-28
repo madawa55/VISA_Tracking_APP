@@ -10,7 +10,7 @@ interface DependentTracker {
 }
 
 const DEFAULT_DEPENDENTS: DependentTracker[] = [
-  { id: "wife", name: "Wife" },
+  { id: "husband", name: "Husband" },
   { id: "daughter", name: "Daughter" }
 ];
 
