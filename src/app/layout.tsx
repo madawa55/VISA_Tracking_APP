@@ -13,8 +13,8 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Next.js Template",
-  description: "A minimal Next.js starter template",
+  title: "NZ Student Visa Tracker",
+  description: "Track your New Zealand student visa and dependent visa application process step by step",
 };
 
 export default function RootLayout({
