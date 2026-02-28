@@ -22,7 +22,8 @@ The template is a clean Next.js 16 starter with TypeScript and Tailwind CSS 4. I
 - [x] Inline edit for each checklist document (name, description, required toggle)
 - [x] Delete individual documents from any step
 - [x] Add new custom documents to any step via inline form
-- [x] localStorage persistence — all tracker state (statuses, edits, added/deleted docs) saved automatically and survives page refresh
+- [x] localStorage persistence — all tracker state saved automatically
+- [x] Multiple dependent visa trackers — add wife, daughter, etc. with separate tracking
 
 ## Current Structure
 
