@@ -14,6 +14,11 @@ The template is a clean Next.js 16 starter with TypeScript and Tailwind CSS 4. I
 - [x] ESLint configuration
 - [x] Memory bank documentation
 - [x] Recipe system for common features
+- [x] NZ Student Visa Tracker — 6-step process with document checklists
+- [x] NZ Dependent Visa Tracker — 5-step process with document checklists
+- [x] Interactive document status tracking (Pending → Collected → Submitted → Approved)
+- [x] Step status management (Not Started / In Progress / Completed / Blocked)
+- [x] Overall progress bar per tracker section
 
 ## Current Structure
 
