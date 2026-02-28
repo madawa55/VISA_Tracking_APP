@@ -1,4 +1,5 @@
 import VisaTracker from "@/components/VisaTracker";
+import DependentVisaSection from "@/components/DependentVisaSection";
 import { studentVisaSteps, dependentVisaSteps } from "@/lib/visaData";
 
 export default function Home() {
@@ -55,15 +56,7 @@ export default function Home() {
         <div className="border-t border-white/10" />
 
         {/* Dependent Visa Section */}
-        <section>
-          <VisaTracker
-            title="👨‍👩‍👧 Dependent Visa"
-            subtitle="Visa for spouse/partner and dependent children travelling with the student"
-            initialSteps={dependentVisaSteps}
-            accentColor="purple"
-            storageKey="nz-dependent-visa-tracker"
-          />
-        </section>
+        <DependentVisaSection />
 
         {/* Footer note */}
         <div className="bg-blue-950/30 border border-blue-800/30 rounded-xl p-5 text-sm text-gray-400">
