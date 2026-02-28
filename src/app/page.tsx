@@ -47,6 +47,7 @@ export default function Home() {
             subtitle="New Zealand Student Visa — step-by-step process from university offer to arrival"
             initialSteps={studentVisaSteps}
             accentColor="blue"
+            storageKey="nz-student-visa-tracker"
           />
         </section>
 
@@ -60,6 +61,7 @@ export default function Home() {
             subtitle="Visa for spouse/partner and dependent children travelling with the student"
             initialSteps={dependentVisaSteps}
             accentColor="purple"
+            storageKey="nz-dependent-visa-tracker"
           />
         </section>
 

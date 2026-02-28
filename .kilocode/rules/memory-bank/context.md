@@ -19,6 +19,9 @@ The template is a clean Next.js 16 starter with TypeScript and Tailwind CSS 4. I
 - [x] Interactive document status tracking (Pending → Collected → Submitted → Approved)
 - [x] Step status management (Not Started / In Progress / Completed / Blocked)
 - [x] Overall progress bar per tracker section
+- [x] Inline edit for each checklist document (name, description, required toggle)
+- [x] Delete individual documents from any step
+- [x] Add new custom documents to any step via inline form
 
 ## Current Structure
 

@@ -1,7 +1,32 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import type { VisaStep, Document, DocumentStatus, StepStatus } from "@/lib/visaData";
+
+// ─── localStorage hook ─────────────────────────────────────────────────────────
+
+function usePersistedSteps(key: string, initialSteps: VisaStep[]): [VisaStep[], React.Dispatch<React.SetStateAction<VisaStep[]>>] {
+  const [steps, setSteps] = useState<VisaStep[]>(() => {
+    if (typeof window === "undefined") return initialSteps;
+    try {
+      const saved = localStorage.getItem(key);
+      if (saved) return JSON.parse(saved) as VisaStep[];
+    } catch {
+      // ignore parse errors
+    }
+    return initialSteps;
+  });
+
+  useEffect(() => {
+    try {
+      localStorage.setItem(key, JSON.stringify(steps));
+    } catch {
+      // ignore storage errors (e.g. private browsing quota)
+    }
+  }, [key, steps]);
+
+  return [steps, setSteps];
+}
 
 // ─── Status helpers ────────────────────────────────────────────────────────────
 
@@ -417,13 +442,15 @@ export default function VisaTracker({
   subtitle,
   initialSteps,
   accentColor = "blue",
+  storageKey,
 }: {
   title: string;
   subtitle: string;
   initialSteps: VisaStep[];
   accentColor?: "blue" | "purple";
+  storageKey?: string;
 }) {
-  const [steps, setSteps] = useState<VisaStep[]>(initialSteps);
+  const [steps, setSteps] = usePersistedSteps(storageKey ?? `visa-tracker-${title}`, initialSteps);
 
   const handleDocStatusChange = (stepId: string, docId: string, status: DocumentStatus) => {
     setSteps((prev) =>
